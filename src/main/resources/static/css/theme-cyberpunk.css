@@ -1,0 +1,161 @@
+/* ==========================================================================
+   KronoCash - theme-cyberpunk.css
+   HUD futurista: Rajdhani, biselados, borde izquierdo de acento y glow.
+   El naranja exacto #C2410C / #FF6B4A se conserva como color de marca y
+   resplandor; el acento de texto se ajusta para garantizar 7:1.
+   ========================================================================== */
+
+html[data-theme="cyberpunk"][data-dark-mode="false"] {
+    --bg-primary: #f0f4f8;     /* blanco hielo técnico */
+    --bg-secondary: #ffffff;
+    --text-main: #090d16;      /* 17.58:1 / 19.43:1 */
+    --text-muted: #384152;     /*  9.29:1 / 10.26:1 */
+    --accent-color: #9d174d;   /*  7.13:1 /  7.88:1 (magenta oscuro) */
+    --accent-hover: #8e0e42;   /*  8.29:1 /  9.16:1 */
+    --error-color: #9d174d;    /*  7.13:1 /  7.88:1 */
+    --border-color: #64748b;
+    --border-width: 1px;
+    --border-radius: 0.25rem;
+    --font-family: "Rajdhani", "Orbitron", "Segoe UI", sans-serif;
+    --shadow: 0 0 0.75rem rgba(194, 65, 12, 0.22);
+    --status-listen: #0f5a2e;
+    --status-speak: #9d174d;
+    --glow-color: rgba(194, 65, 12, 0.35);
+    --mascota-shadow: drop-shadow(0 0 8px var(--accent-color));
+    --nav-glow: rgba(157, 23, 77, 0.35);
+    --nav-glow-hover: rgba(157, 23, 77, 0.45);
+    --nav-glow-box: rgba(157, 23, 77, 0.30);
+    --nav-bg-hover: rgba(157, 23, 77, 0.05);
+}
+
+html[data-theme="cyberpunk"][data-dark-mode="true"] {
+    --bg-primary: #05050a;     /* negro violeta profundo */
+    --bg-secondary: #0d0e1c;
+    --text-main: #f8fafc;      /* 19.44:1 / 18.30:1 */
+    --text-muted: #b8c4d9;     /* 11.56:1 / 10.88:1 */
+    --accent-color: #ff8a66;   /*  8.79:1 /  8.28:1 */
+    --accent-hover: #ffa07a;   /* 10.6:1 / 10.0:1 */
+    --error-color: #fda4af;    /* 10.76:1 / 10.13:1 */
+    --border-color: #475569;
+    --border-width: 1px;
+    --border-radius: 0.25rem;
+    --font-family: "Rajdhani", "Orbitron", "Segoe UI", sans-serif;
+    --shadow: 0 0 0.75rem var(--glow-color);
+    --status-listen: #4ade80;
+    --status-speak: #38bdf8;
+    --glow-color: rgba(255, 107, 74, 0.45);
+    --mascota-shadow: drop-shadow(0 0 8px var(--accent-color));
+    --nav-glow: rgba(255, 138, 102, 0.35);
+    --nav-glow-hover: rgba(255, 138, 102, 0.45);
+    --nav-glow-box: rgba(255, 138, 102, 0.30);
+    --nav-bg-hover: rgba(255, 138, 102, 0.05);
+}
+
+/* --------------------------------------------------------------------------
+   Compensación óptica de Rajdhani: x-height y glifos más estrechos que
+   Inter/Courier New. font-size-adjust estabiliza la altura de las "x" y el
+   tamaño relativo se expresa en rem para seguir el control 100%-200%.
+   -------------------------------------------------------------------------- */
+html[data-theme="cyberpunk"] {
+    font-size-adjust: 0.54;
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+}
+
+html[data-theme="cyberpunk"] body,
+html[data-theme="cyberpunk"] .main-content,
+html[data-theme="cyberpunk"] p,
+html[data-theme="cyberpunk"] label,
+html[data-theme="cyberpunk"] input,
+html[data-theme="cyberpunk"] select,
+html[data-theme="cyberpunk"] button {
+    font-size: calc(1rem * 1.08);
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+}
+
+/* Geometría biselada: fallback limpio en navegadores sin clip-path. */
+html[data-theme="cyberpunk"] .card,
+html[data-theme="cyberpunk"] button,
+html[data-theme="cyberpunk"] .navbar {
+    border-left: 4px solid var(--accent-color);
+}
+
+@supports (clip-path: polygon(0 0)) {
+    html[data-theme="cyberpunk"] .card,
+    html[data-theme="cyberpunk"] button,
+    html[data-theme="cyberpunk"] .krono-floating-panel {
+        clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px,
+                           100% 100%, 14px 100%, 0 calc(100% - 14px));
+    }
+}
+
+/* --------------------------------------------------------------------------
+   SC 2.4.11 / 2.4.13: clip-path recorta el outline externo de los BOTONES
+   biselados. Solo ellos usan anillo interior e inversión de fondo/texto.
+   Los botones Micrófono/Voz de Krono son buttons, por lo que quedan cubiertos.
+   -------------------------------------------------------------------------- */
+html[data-theme="cyberpunk"] button:focus-visible,
+html[data-theme="cyberpunk"] .btn:focus-visible,
+html[data-theme="cyberpunk"] #mascot-widget button:focus-visible,
+html[data-theme="cyberpunk"] .mascot-widget button:focus-visible {
+    box-shadow: inset 0 0 0 3px var(--bg-primary),
+                inset 0 0 0 6px var(--text-main) !important;
+    background-color: var(--text-main) !important;
+    color: var(--bg-primary) !important;
+}
+
+/* Enlaces y logotipo: outline limpio, SIN inset y SIN inversiones de fondo. */
+html[data-theme="cyberpunk"] a:not(.btn):focus-visible,
+html[data-theme="cyberpunk"] .nav-link:focus-visible,
+html[data-theme="cyberpunk"] .brand-link:focus-visible,
+html[data-theme="cyberpunk"] .brand-logo:focus-visible {
+    outline: 3px solid var(--accent-color);
+    outline-offset: 4px;
+}
+
+/* Navbar HUD: realce sutil permanente, persistente en hover y en la sección activa. */
+html[data-theme="cyberpunk"] .nav-link {
+    /* Equivalente a color-mix(in srgb, --accent-color 35%, transparent). */
+    text-shadow: 0 0 6px var(--nav-glow);
+    transition: text-shadow 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+html[data-theme="cyberpunk"] .nav-link:hover,
+html[data-theme="cyberpunk"] .nav-link.active {
+    /* 5% de acento: mantiene >=7:1 en claro (7.21) y oscuro (7.81). */
+    background-color: var(--nav-bg-hover);
+    box-shadow: 0 0 10px var(--nav-glow-box);
+    text-shadow: 0 0 8px var(--nav-glow-hover);
+}
+
+/* Validación con estética HUD: borde biselado y glow. */
+html[data-theme="cyberpunk"] .theme-toast,
+html[data-theme="cyberpunk"] .field-error-msg {
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px,
+                       100% 100%, 12px 100%, 0 calc(100% - 12px));
+    box-shadow: 0 0 12px var(--glow-color);
+}
+
+/* Hover: los botones biselados usan el mismo anillo interior del foco. */
+html[data-theme="cyberpunk"] button:hover,
+html[data-theme="cyberpunk"] .btn:hover,
+html[data-theme="cyberpunk"] #mascot-widget button:hover,
+html[data-theme="cyberpunk"] .mascot-widget button:hover {
+    box-shadow: inset 0 0 0 3px var(--bg-primary),
+                inset 0 0 0 6px var(--text-main) !important;
+}
+
+/* Los enlaces conservan su fondo y usan solo un outline limpio. */
+html[data-theme="cyberpunk"] a:not(.btn):hover,
+html[data-theme="cyberpunk"] .nav-link:hover,
+html[data-theme="cyberpunk"] .brand-link:hover {
+    outline: 3px solid var(--accent-color);
+    outline-offset: 3px;
+}
+
+/* Halo externo en un padre SIN clip-path: no se pierde el contorno del widget. */
+html[data-theme="cyberpunk"] .mascot-actions:focus-within,
+html[data-theme="cyberpunk"] .navbar-list:focus-within {
+    filter: drop-shadow(0 0 3px var(--accent-color));
+}

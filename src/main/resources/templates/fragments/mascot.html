@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<body>
+<!--
+  Krono, asistente virtual. SVG original estilizado SOLO con variables CSS.
+  #krono-visor-clip confina ojos, boca y ondas dentro del visor; los grupos
+  #krono-eyes-open / .krono-eyes-closed animan los estados sin superponerse.
+-->
+<aside th:fragment="mascot"
+       id="mascot-widget"
+       aria-label="Asistente virtual Krono"
+       class="mascot-widget"
+       data-mascot-state="idle">
+
+    <!-- Ventana flotante: en escritorio es el widget; en móvil se abre desde «Asistente». -->
+    <div id="krono-floating-panel" role="region" aria-label="Panel del asistente Krono">
+        <div class="krono-panel-header">
+            <h2>Asistente Krono</h2>
+            <button type="button" id="krono-panel-close" class="krono-panel-close"
+                    aria-label="Cerrar panel de Krono">×</button>
+        </div>
+
+        <svg id="krono-svg" class="mascot-svg" viewBox="0 0 140 140" role="img"
+             aria-labelledby="krono-title krono-desc">
+            <title id="krono-title">Krono, asistente virtual</title>
+            <desc id="krono-desc">Robot-reloj con antena luminosa, visor expresivo y ondas de voz animadas.</desc>
+
+            <defs>
+                <clipPath id="krono-visor-clip">
+                    <rect x="35" y="51" width="70" height="36" rx="10"></rect>
+                </clipPath>
+            </defs>
+
+            <g class="mascot-antenna">
+                <circle cx="70" cy="11" r="8"></circle>
+            </g>
+            <line class="mascot-detail" x1="70" y1="19" x2="70" y2="30"></line>
+            <circle class="mascot-detail" cx="70" cy="11" r="12"></circle>
+
+            <rect class="mascot-case mascot-card" x="16" y="28" width="108" height="100" rx="18"
+                  fill="var(--bg-secondary)"></rect>
+            <rect class="mascot-panel" x="24" y="36" width="92" height="84" rx="14"></rect>
+            <rect class="mascot-detail" x="10" y="58" width="8" height="38" rx="3"></rect>
+            <rect class="mascot-detail" x="122" y="58" width="8" height="38" rx="3"></rect>
+            <circle class="mascot-detail" cx="33" cy="45" r="2"></circle>
+            <circle class="mascot-detail" cx="107" cy="45" r="2"></circle>
+            <circle class="mascot-detail" cx="33" cy="111" r="2"></circle>
+            <circle class="mascot-detail" cx="107" cy="111" r="2"></circle>
+
+            <line class="mascot-detail" x1="70" y1="36" x2="70" y2="42"></line>
+            <line class="mascot-detail" x1="70" y1="114" x2="70" y2="120"></line>
+
+            <rect class="mascot-visor" x="34" y="50" width="72" height="38" rx="11"
+                  fill="var(--bg-primary)"></rect>
+
+            <g clip-path="url(#krono-visor-clip)">
+                <g class="krono-eyes-open">
+                    <ellipse class="mascot-eye" cx="54.5" cy="68.5" rx="5.5" ry="8"></ellipse>
+                    <ellipse class="mascot-eye" cx="85.5" cy="68.5" rx="5.5" ry="8"></ellipse>
+                </g>
+                <g class="krono-eyes-closed">
+                    <path class="mascot-eye-closed" d="M49 69 Q54.5 75 60 69"></path>
+                    <path class="mascot-eye-closed" d="M80 69 Q85.5 75 91 69"></path>
+                    <path class="mascot-eye-closed" d="M50 70 l-1.5 2 M54.5 72 l0 2 M59 70 l1.5 2"></path>
+                    <path class="mascot-eye-closed" d="M81 70 l-1.5 2 M85.5 72 l0 2 M90 70 l1.5 2"></path>
+                </g>
+                <g id="krono-mouth">
+                    <path class="mascot-mouth" d="M58 78 Q70 85 82 78"></path>
+                </g>
+                <g id="krono-voice-waves">
+                    <path class="mascot-wave wave-1" d="M60 82 Q70 86 80 82"></path>
+                    <path class="mascot-wave wave-2" d="M56 83 Q70 87 84 83"></path>
+                    <path class="mascot-wave wave-3" d="M62 85 Q70 87 78 85"></path>
+                </g>
+            </g>
+        </svg>
+
+        <p id="mascot-message" class="mascot-bubble" role="status" aria-live="polite">
+            <span id="mascot-message-text"
+                  th:text="${isBirthdayUser != null and isBirthdayUser}
+                           ? '¡Feliz cumpleaños, Christianzacui! Soy Krono y estoy aquí para ayudarte hoy.'
+                           : 'Hola, soy Krono. Di «ayuda» para conocer los comandos disponibles.'">Hola, soy Krono. Di «ayuda» para conocer los comandos disponibles.</span>
+            <button type="button" id="mascot-bubble-close" class="mascot-bubble-close" aria-label="Cerrar mensaje de Krono">×</button>
+        </p>
+
+        <p id="mascot-help" class="sr-only">
+            El botón de micrófono activa y desactiva la escucha; el botón de voz silencia o lee en voz alta los mensajes.
+        </p>
+        <div class="mascot-actions">
+            <button type="button" id="mascot-mic" class="touch-target mascot-button"
+                    aria-pressed="false" aria-describedby="mascot-help" aria-label="Activar micrófono">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <rect x="9" y="3" width="6" height="11" rx="3"></rect>
+                    <path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path>
+                </svg>
+                <span>Micrófono</span>
+            </button>
+            <button type="button" id="mascot-speak" class="touch-target mascot-button"
+                    aria-pressed="false" aria-describedby="mascot-help" aria-label="Silenciar lectura en voz alta">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M4 9v6h4l5 4V5L8 9H4z"></path>
+                    <path d="M17 9a4 4 0 0 1 0 6"></path>
+                </svg>
+                <span>Voz</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Botón compacto del dock inferior en móvil/tablet. -->
+    <button type="button" id="krono-mobile-toggle" class="touch-target krono-mobile-toggle"
+            aria-expanded="false" aria-controls="krono-floating-panel" aria-label="Abrir asistente">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="9"></circle>
+            <circle cx="9" cy="11" r="1"></circle>
+            <circle cx="15" cy="11" r="1"></circle>
+        </svg>
+        <span>Asistente</span>
+    </button>
+</aside>
+</body>
+</html>

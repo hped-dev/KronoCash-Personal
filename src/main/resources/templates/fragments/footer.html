@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<body>
+<footer role="contentinfo" class="site-footer" th:fragment="footer">
+    <div class="footer-grid">
+        <section aria-labelledby="footer-brand-titulo">
+            <h2 id="footer-brand-titulo" class="brand-link">
+                <svg class="brand-logo" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
+                    <path d="M12 2 H24 L34 12 V24 L24 34 H12 L2 24 V12 Z"
+                          fill="var(--bg-primary)" stroke="var(--accent-color)" stroke-width="2"></path>
+                    <circle cx="18" cy="18" r="11" fill="none" stroke="var(--accent-color)" stroke-width="2"></circle>
+                    <path d="M18 7 A11 11 0 0 1 29 18" fill="none" stroke="var(--accent-color)"
+                          stroke-width="2" stroke-linecap="round"></path>
+                    <polygon points="18,10 25,18 18,26 11,18" fill="var(--accent-color)"
+                             stroke="var(--bg-primary)" stroke-width="1.5"></polygon>
+                    <line x1="18" y1="18" x2="18" y2="13" stroke="var(--bg-primary)"
+                          stroke-width="2" stroke-linecap="round"></line>
+                </svg>
+                <span class="brand-wordmark"><span class="brand-krono">Krono</span><span class="brand-cash">Cash</span></span>
+            </h2>
+            <p>Plataforma de productividad financiera con accesibilidad universal WCAG 2.2 AAA.</p>
+        </section>
+
+        <section aria-labelledby="footer-links-titulo">
+            <h2 id="footer-links-titulo">Enlaces rápidos</h2>
+            <ul>
+                <li><a class="touch-target" th:href="@{/}">Inicio</a></li>
+                <li th:if="${authenticated}"><a class="touch-target" th:href="@{/dashboard}">Panel financiero</a></li>
+                <li th:if="${authenticated}"><a class="touch-target" th:href="@{/simulator}">Simulador</a></li>
+                <li th:if="${authenticated}"><a class="touch-target" th:href="@{/settings}">Ajustes de accesibilidad</a></li>
+                <li th:unless="${authenticated}"><a class="touch-target" th:href="@{/login}">Iniciar sesión</a></li>
+            </ul>
+        </section>
+
+        <section aria-labelledby="footer-project-titulo">
+            <h2 id="footer-project-titulo">Proyecto</h2>
+            <ul>
+                <li>Versión 1.0</li>
+                <li>Estándar WCAG 2.2 AAA</li>
+                <li>Equipo GIU26B</li>
+            </ul>
+            <a class="touch-target" href="#contenido-principal">Volver arriba</a>
+        </section>
+    </div>
+</footer>
+</body>
+</html>

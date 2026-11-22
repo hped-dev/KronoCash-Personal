@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es"
+      th:attr="data-theme=${theme},data-dark-mode=${darkMode},data-reduce-motion=${reduceMotion},data-font-scale=${fontScale}"
+      th:style="'--font-scale: ' + ${fontScale} + '%'">
+<head th:replace="~{fragments/head :: head('Panel financiero')}">
+    <title>Panel financiero - KronoCash</title>
+</head>
+<body>
+<a th:replace="~{fragments/head :: skipLink}">Saltar al contenido principal</a>
+<p id="a11y-status" class="sr-only" role="status" aria-live="polite"></p>
+<header th:replace="~{fragments/navbar :: navbar}">Navegación principal</header>
+
+<main id="contenido-principal" class="container" tabindex="-1">
+    <h1>Panel financiero</h1>
+
+    <!-- Error de saldo insuficiente: se muestra con el sistema de notificaciones del tema. -->
+    <div th:if="${balanceError}" class="theme-toast-container" role="alert" aria-live="assertive">
+        <p class="theme-toast" th:text="${balanceError}">Saldo insuficiente.</p>
+    </div>
+
+    <section class="card" aria-labelledby="resumen-titulo">
+        <h2 id="resumen-titulo">Resumen financiero</h2>
+
+        <ul class="summary-grid">
+            <li class="summary-card">
+                <h3>Balance total</h3>
+                <p class="summary-value" th:text="${summary.totalBalance}">0.00</p>
+            </li>
+            <li class="summary-card">
+                <h3>Total apartado en metas</h3>
+                <p class="summary-value" th:text="${summary.totalSavedInGoals}">0.00</p>
+            </li>
+            <li class="summary-card">
+                <h3>Balance disponible</h3>
+                <p class="summary-value" th:text="${summary.availableBalance}">0.00</p>
+            </li>
+            <li class="summary-card">
+                <h3>Ingresos del mes</h3>
+                <p class="summary-value" th:text="${summary.monthlyIncome}">0.00</p>
+            </li>
+            <li class="summary-card">
+                <h3>Egresos del mes</h3>
+                <p class="summary-value" th:text="${summary.monthlyExpense}">0.00</p>
+            </li>
+            <li class="summary-card">
+                <h3>Resultado del mes</h3>
+                <p class="summary-value"
+                   th:text="${summary.monthlyNet} + (${summary.monthlyNet < 0} ? ' (Déficit mensual)' : '')">0.00</p>
+            </li>
+        </ul>
+
+        <p>
+            Movimientos registrados: <span th:text="${summary.transactionCount}">0</span>.
+            Periodo: <span th:text="${summary.periodStart}">inicio</span>
+            — <span th:text="${summary.periodEnd}">fin</span>.
+        </p>
+
+        <h3 id="progreso-titulo">Progreso de metas de ahorro</h3>
+        <p th:if="${#lists.isEmpty(summary.goals)}">Todavía no hay metas de ahorro.</p>
+        <ul class="goal-grid" th:unless="${#lists.isEmpty(summary.goals)}">
+            <li class="summary-card"
+                th:each="goal : ${summary.goals}"
+                th:with="pct=${goal.progressPercent < 0 ? 0 : (goal.progressPercent > 100 ? 100 : goal.progressPercent)}">
+                <h4 th:text="${goal.title}">Meta de ahorro</h4>
+                <p>
+                    <span th:text="${goal.currentAmount}">0</span>
+                    de <span th:text="${goal.targetAmount}">0</span>
+                </p>
+                <!--
+                  SC 1.1.1 y 4.1.2: barra con nombre, valor numérico y valor
+                  textual; el porcentaje también está en texto visible.
+                  El ancho usa solo un porcentaje, sin colores inline.
+                -->
+                <div class="progress-track"
+                     role="progressbar"
+                     aria-valuemin="0"
+                     aria-valuemax="100"
+                     th:attr="aria-valuenow=${pct},aria-valuetext=${pct + '% completado'},aria-label='Progreso de la meta ' + ${goal.title}">
+                    <div class="progress-fill" th:style="'width: ' + ${pct} + '%'"></div>
+                </div>
+                <p>
+                    <span th:text="${pct}">0</span>% completado ·
+                    <span th:text="${goal.remainingAmount}">0</span> restante
+                </p>
+
+                <!-- Apartar/retirar fondos no crea egresos: solo mueve saldo disponible. -->
+                <form class="goal-funds" th:action="@{/dashboard/goals/{id}/deposit(id=${goal.id})}" method="post" novalidate>
+                    <label th:for="'deposit-' + ${goal.id}" th:text="'Añadir fondos a ' + ${goal.title}">Añadir fondos</label>
+                    <input type="number" th:id="'deposit-' + ${goal.id}" name="amount" class="touch-target"
+                           min="0.01" step="0.01" required
+                           th:attr="aria-describedby='goal-funds-help-' + ${goal.id}">
+                    <button type="submit" class="touch-target" th:attr="aria-label='Añadir fondos a ' + ${goal.title}">+ Añadir</button>
+                </form>
+                <form class="goal-funds" th:action="@{/dashboard/goals/{id}/withdraw(id=${goal.id})}" method="post" novalidate>
+                    <label th:for="'withdraw-' + ${goal.id}" th:text="'Retirar fondos de ' + ${goal.title}">Retirar fondos</label>
+                    <input type="number" th:id="'withdraw-' + ${goal.id}" name="amount" class="touch-target"
+                           min="0.01" step="0.01" required
+                           th:attr="aria-describedby='goal-funds-help-' + ${goal.id}">
+                    <button type="submit" class="touch-target" th:attr="aria-label='Retirar fondos de ' + ${goal.title}">− Retirar</button>
+                </form>
+                <form class="goal-funds" th:action="@{/dashboard/goals/{id}/delete(id=${goal.id})}" method="post">
+                    <button type="submit" class="touch-target"
+                            th:attr="aria-label='Eliminar la meta ' + ${goal.title}">Eliminar meta</button>
+                </form>
+                <p class="sr-only" th:id="'goal-funds-help-' + ${goal.id}">Importe en pesos mexicanos con al menos dos decimales. Apartar dinero no genera un gasto.</p>
+            </li>
+        </ul>
+    </section>
+
+    <section class="card" id="seccion-movimientos" aria-labelledby="movimiento-titulo">
+        <h2 id="movimiento-titulo">Registrar un ingreso o gasto</h2>
+        <form th:action="@{/dashboard/transactions}" method="post" th:object="${transactionForm}" novalidate>
+            <p th:if="${#fields.hasErrors('*')}" role="alert">
+                Revise los campos señalados a continuación.
+            </p>
+
+            <div>
+                <label for="tx-type">Tipo de movimiento</label>
+                <select id="tx-type" class="touch-target" th:field="*{type}" aria-describedby="tx-type-errors">
+                    <option value="INCOME">Ingreso</option>
+                    <option value="EXPENSE">Egreso</option>
+                </select>
+                <p id="tx-type-errors" class="error"
+                   th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></p>
+            </div>
+
+            <div>
+                <label for="tx-category">Categoría</label>
+                <input type="text" id="tx-category" class="touch-target" th:field="*{category}" maxlength="50"
+                       aria-describedby="tx-category-errors" required>
+                <p id="tx-category-errors" class="error"
+                   th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></p>
+            </div>
+
+            <div>
+                <label for="tx-amount">Importe</label>
+                <input type="number" id="tx-amount" class="touch-target" th:field="*{amount}" min="0.01" step="0.01"
+                       aria-describedby="tx-amount-errors" required>
+                <p id="tx-amount-errors" class="error"
+                   th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></p>
+            </div>
+
+            <div>
+                <label for="tx-date">Fecha</label>
+                <input type="date" id="tx-date" class="touch-target" th:field="*{transactionDate}"
+                       aria-describedby="tx-date-errors" required>
+                <p id="tx-date-errors" class="error"
+                   th:if="${#fields.hasErrors('transactionDate')}" th:errors="*{transactionDate}"></p>
+            </div>
+
+            <div>
+                <label for="tx-description">Descripción (opcional)</label>
+                <input type="text" id="tx-description" class="touch-target" th:field="*{description}" maxlength="255"
+                       aria-describedby="tx-description-errors">
+                <p id="tx-description-errors" class="error"
+                   th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></p>
+            </div>
+
+            <button type="submit" class="touch-target">Añadir movimiento</button>
+        </form>
+    </section>
+
+    <section class="card" aria-labelledby="filtros-titulo">
+        <h2 id="filtros-titulo">Filtrar historial</h2>
+        <!--
+          SC 2.1.1 / 2.1.2: formulario GET nativo, sin gestores de teclas ni
+          cambios de foco: Tab/Shift+Tab recorren los campos y Entrar aplica.
+        -->
+        <p id="filtros-ayuda">Recorra los campos con Tab y pulse Entrar para aplicar los filtros. El número de resultados se anuncia automáticamente.</p>
+        <form th:action="@{/dashboard}" method="get">
+            <div>
+                <label for="filter-type">Tipo</label>
+                <select id="filter-type" name="type" class="touch-target" aria-describedby="filtros-ayuda">
+                    <option value="">Todos</option>
+                    <option value="INCOME" th:selected="${type?.name() == 'INCOME'}">Ingresos</option>
+                    <option value="EXPENSE" th:selected="${type?.name() == 'EXPENSE'}">Egresos</option>
+                </select>
+            </div>
+            <div>
+                <label for="filter-category">Categoría</label>
+                <input type="text" id="filter-category" name="category" class="touch-target" maxlength="50"
+                       aria-describedby="filtros-ayuda" th:value="${category}">
+            </div>
+            <div>
+                <label for="filter-from">Desde</label>
+                <input type="date" id="filter-from" name="from" class="touch-target"
+                       aria-describedby="filtros-ayuda" th:value="${from}">
+            </div>
+            <div>
+                <label for="filter-to">Hasta</label>
+                <input type="date" id="filter-to" name="to" class="touch-target"
+                       aria-describedby="filtros-ayuda" th:value="${to}">
+            </div>
+            <button type="submit" class="touch-target">Aplicar filtros</button>
+            <a class="touch-target" th:href="@{/dashboard}">Ver todos los movimientos</a>
+        </form>
+    </section>
+
+    <section class="card" aria-labelledby="historial-titulo">
+        <h2 id="historial-titulo">Historial de movimientos</h2>
+
+        <!-- SC 4.1.3: se anuncian los resultados tras filtrar y tras eliminar. -->
+        <p id="resultados-estado" role="status" aria-live="polite"
+           th:text="${param.deleted != null ? 'Movimiento eliminado. ' : ''} + 'Se encontraron ' + ${#lists.size(transactions)} + ' ' + ${#lists.size(transactions) == 1 ? 'movimiento' : 'movimientos'} + '.'">
+            Se encontraron 0 movimientos.
+        </p>
+
+        <p th:if="${#lists.isEmpty(transactions)}">No hay movimientos que coincidan con los filtros.</p>
+        <div class="table-responsive" th:unless="${#lists.isEmpty(transactions)}">
+        <table>
+            <caption>Movimientos filtrados. Los importes se muestran en MXN.</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Categoría</th>
+                    <th scope="col">Descripción</th>
+                    <th scope="col">Importe (MXN)</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="tx : ${transactions}">
+                    <td th:text="${tx.transactionDate}">fecha</td>
+                    <td th:text="${tx.type.name() == 'INCOME' ? 'Ingreso' : 'Gasto'}">tipo</td>
+                    <td th:text="${tx.category}">categoría</td>
+                    <td th:text="${tx.description} ?: '—'">descripción</td>
+                    <td th:text="'$' + ${#numbers.formatDecimal(tx.amount, 1, 'COMMA', 2, 'POINT')} + ' MXN'">$0.00 MXN</td>
+                    <td>
+                        <form th:action="@{/dashboard/transactions/{id}/delete(id=${tx.id})}" method="post">
+                            <button type="submit" class="touch-target"
+                                    th:attr="aria-label='Eliminar movimiento del ' + ${tx.transactionDate}">
+                                Eliminar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </section>
+
+    <section class="card" id="seccion-metas" aria-labelledby="metas-titulo">
+        <h2 id="metas-titulo">Metas de ahorro</h2>
+        <p th:if="${#lists.isEmpty(summary.goals)}">Todavía no hay metas de ahorro.</p>
+        <div class="table-responsive" th:unless="${#lists.isEmpty(summary.goals)}">
+        <table>
+            <caption class="sr-only">Detalle del progreso de las metas de ahorro</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Meta</th>
+                    <th scope="col">Objetivo</th>
+                    <th scope="col">Ahorrado</th>
+                    <th scope="col">Progreso</th>
+                    <th scope="col">Restante</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="goal : ${summary.goals}">
+                    <td th:text="${goal.title}">meta</td>
+                    <td th:text="${goal.targetAmount}">objetivo</td>
+                    <td th:text="${goal.currentAmount}">ahorrado</td>
+                    <td th:text="${goal.progressPercent} + '%'">0%</td>
+                    <td th:text="${goal.remainingAmount}">restante</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+
+        <h3>Nueva meta</h3>
+        <form th:action="@{/dashboard/goals}" method="post" th:object="${goalForm}" novalidate>
+            <p th:if="${#fields.hasErrors('*')}" role="alert">
+                Revise los campos señalados a continuación.
+            </p>
+            <div>
+                <label for="goal-title">Título</label>
+                <input type="text" id="goal-title" class="touch-target" th:field="*{title}" maxlength="100"
+                       aria-describedby="goal-title-errors" required>
+                <p id="goal-title-errors" class="error"
+                   th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+            </div>
+            <div>
+                <label for="goal-target">Importe objetivo</label>
+                <input type="number" id="goal-target" class="touch-target" th:field="*{targetAmount}"
+                       min="0.01" step="0.01" aria-describedby="goal-target-errors" required>
+                <p id="goal-target-errors" class="error"
+                   th:if="${#fields.hasErrors('targetAmount')}" th:errors="*{targetAmount}"></p>
+            </div>
+            <div>
+                <label for="goal-deadline">Fecha límite (opcional)</label>
+                <input type="date" id="goal-deadline" class="touch-target" th:field="*{deadline}">
+            </div>
+            <button type="submit" class="touch-target">Crear meta</button>
+        </form>
+    </section>
+
+    <section class="card" id="seccion-habitos" aria-labelledby="habitos-titulo">
+        <h2 id="habitos-titulo">Hábitos diarios</h2>
+        <p th:if="${#lists.isEmpty(habits)}">Todavía no hay hábitos registrados.</p>
+        <ul th:unless="${#lists.isEmpty(habits)}">
+            <li class="habit-item" th:each="habit : ${habits}">
+                <span th:text="${habit.title}">hábito</span>
+                <span th:text="${habit.frequency.label}">frecuencia</span>
+                <span th:text="'Racha: ' + ${habit.streakCount}">Racha: 0</span>
+                <span th:if="${habit.completedToday}">Completado hoy</span>
+                <span th:unless="${habit.completedToday}">Pendiente hoy</span>
+
+                <form th:if="${!habit.completedToday}"
+                      th:action="@{/dashboard/habits/{id}/complete(id=${habit.id})}" method="post">
+                    <button type="submit" class="touch-target"
+                            th:attr="aria-label='Completar ' + ${habit.title}">Completar</button>
+                </form>
+                <form th:if="${habit.completedToday}"
+                      th:action="@{/dashboard/habits/{id}/undo(id=${habit.id})}" method="post">
+                    <button type="submit" class="touch-target"
+                            th:attr="aria-label='Desmarcar ' + ${habit.title}">Desmarcar</button>
+                </form>
+            </li>
+        </ul>
+
+        <h3>Nuevo hábito</h3>
+        <form th:action="@{/dashboard/habits}" method="post" th:object="${habitForm}" novalidate>
+            <p th:if="${#fields.hasErrors('*')}" role="alert">
+                Revise los campos señalados a continuación.
+            </p>
+            <div>
+                <label for="habit-title">Título</label>
+                <input type="text" id="habit-title" class="touch-target" th:field="*{title}" maxlength="100"
+                       aria-describedby="habit-title-errors" required>
+                <p id="habit-title-errors" class="error"
+                   th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+            </div>
+            <div>
+                <label for="habit-frequency">Frecuencia</label>
+                <select id="habit-frequency" class="touch-target" th:field="*{frequency}"
+                        aria-describedby="habit-frequency-errors">
+                    <option value="DAILY" th:text="Diaria">Diaria</option>
+                    <option value="WEEKLY" th:text="Semanal">Semanal</option>
+                    <option value="MONTHLY" th:text="Mensual">Mensual</option>
+                </select>
+                <p id="habit-frequency-errors" class="error"
+                   th:if="${#fields.hasErrors('frequency')}" th:errors="*{frequency}"></p>
+            </div>
+            <button type="submit" class="touch-target">Crear hábito</button>
+        </form>
+    </section>
+</main>
+<div th:replace="~{fragments/mascot :: mascot}">Asistente virtual Krono</div>
+<div th:replace="~{fragments/a11y-widget :: a11yWidget}">Opciones de accesibilidad</div>
+<div th:replace="~{fragments/footer :: footer}">Pie de página</div>
+
+<!--
+  El contenido inicial de la región aria-live ya viene del servidor; al
+  vaciarlo y volver a escribirlo tras la carga se garantiza que los lectores
+  de pantalla lo anuncien también cuando el filtro se aplicó mediante GET.
+-->
+<script th:inline="none">
+    document.addEventListener('DOMContentLoaded', function () {
+        var region = document.getElementById('resultados-estado');
+        if (!region) {
+            return;
+        }
+        var message = region.textContent;
+        region.textContent = '';
+        window.setTimeout(function () {
+            region.textContent = message;
+        }, 60);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es"
+      th:attr="data-theme=${theme},data-dark-mode=${darkMode},data-reduce-motion=${reduceMotion},data-font-scale=${fontScale}"
+      th:style="'--font-scale: ' + ${fontScale} + '%'">
+<head th:replace="~{fragments/head :: head('Simulador financiero')}">
+    <title>Simulador financiero - KronoCash</title>
+</head>
+<body>
+<a th:replace="~{fragments/head :: skipLink}">Saltar al contenido principal</a>
+<p id="a11y-status" class="sr-only" role="status" aria-live="polite"></p>
+<header th:replace="~{fragments/navbar :: navbar}">Navegación principal</header>
+
+<main id="contenido-principal" class="container" tabindex="-1">
+    <h1>Simulador financiero</h1>
+    <p>Cada parámetro tiene un deslizador y un campo numéro vinculados: use las flechas para ajustes rápidos o escriba el valor exacto. Con Tab se recorren los controles en orden.</p>
+
+    <section class="card" aria-labelledby="parametros-titulo">
+        <h2 id="parametros-titulo">Parámetros de la simulación</h2>
+        <form id="simulator-form" th:action="@{/simulator/calculate}" method="post"
+              th:object="${simulationRequest}" novalidate>
+            <fieldset class="simulator-fieldset">
+                <legend>Variables de la proyección</legend>
+
+                <div>
+                    <label for="goalSelect">Meta de ahorro (opcional)</label>
+                    <select id="goalSelect" name="goalId" class="touch-target"
+                            aria-describedby="goalSelect-help">
+                        <option value="" data-remaining="0">Ninguna (usar horizonte manual)</option>
+                        <option th:each="goal : ${goals}"
+                                th:value="${goal.id}"
+                                th:attr="data-remaining=${goal.targetAmount - goal.currentAmount}"
+                                th:text="${goal.title} + ' — restan ' + ${goal.targetAmount - goal.currentAmount} + ' MXN'">
+                            Meta
+                        </option>
+                    </select>
+                    <p id="goalSelect-help">Al elegir una meta se calcula automáticamente el tiempo necesario y se desactiva el horizonte manual.</p>
+                </div>
+
+                <div class="control-pair">
+                    <label for="monthlyIncome">Ingreso mensual</label>
+                    <input type="range" id="monthlyIncome" name="monthlyIncome" class="touch-target"
+                           min="0" max="25000" step="100" th:value="${simulationRequest.monthlyIncome}"
+                           aria-describedby="monthlyIncome-help">
+                    <label for="monthlyIncomeNumber">Valor exacto (MXN)</label>
+                    <input type="number" id="monthlyIncomeNumber" class="touch-target" min="0" max="25000"
+                           step="0.01" inputmode="decimal" th:value="${simulationRequest.monthlyIncome}"
+                           aria-describedby="monthlyIncome-help">
+                    <p id="monthlyIncome-help">Ingreso mensual en pesos mexicanos (0 - 25,000 MXN). El campo numérico permite escribir un valor exacto.</p>
+                    <output id="monthlyIncomeValue" for="monthlyIncome monthlyIncomeNumber"></output>
+                </div>
+
+                <div class="control-pair">
+                    <label for="savingsPercentage">Porcentaje de ahorro</label>
+                    <input type="range" id="savingsPercentage" name="savingsPercentage" class="touch-target"
+                           min="0" max="100" step="1" th:value="${simulationRequest.savingsPercentage}"
+                           aria-describedby="savingsPercentage-help">
+                    <label for="savingsPercentageNumber">Valor exacto (%)</label>
+                    <input type="number" id="savingsPercentageNumber" class="touch-target" min="0" max="100"
+                           step="1" inputmode="decimal" th:value="${simulationRequest.savingsPercentage}"
+                           aria-describedby="savingsPercentage-help">
+                    <p id="savingsPercentage-help">Parte del ingreso destinada al ahorro (0 – 100 %).</p>
+                    <output id="savingsPercentageValue" for="savingsPercentage savingsPercentageNumber"></output>
+                </div>
+
+                <div class="control-pair">
+                    <label for="antExpensesCut">Recorte de gastos hormiga</label>
+                    <input type="range" id="antExpensesCut" name="antExpensesCut" class="touch-target"
+                           min="0" max="1000" step="10" th:value="${simulationRequest.antExpensesCut}"
+                           aria-describedby="antExpensesCut-help">
+                    <label for="antExpensesCutNumber">Valor exacto (MXN)</label>
+                    <input type="number" id="antExpensesCutNumber" class="touch-target" min="0" max="1000"
+                           step="10" inputmode="decimal" th:value="${simulationRequest.antExpensesCut}"
+                           aria-describedby="antExpensesCut-help">
+                    <p id="antExpensesCut-help">Ahorro adicional mensual por reducir pequeños gastos.</p>
+                    <output id="antExpensesCutValue" for="antExpensesCut antExpensesCutNumber"></output>
+                </div>
+
+                <div class="control-pair">
+                    <label for="monthsHorizon">Horizonte en meses</label>
+                    <input type="range" id="monthsHorizon" name="monthsHorizon" class="touch-target"
+                           min="1" max="120" step="1" th:value="${simulationRequest.monthsHorizon}"
+                           aria-describedby="monthsHorizon-help">
+                    <label for="monthsHorizonNumber">Valor exacto (meses)</label>
+                    <input type="number" id="monthsHorizonNumber" class="touch-target" min="1" max="120"
+                           step="1" inputmode="numeric" th:value="${simulationRequest.monthsHorizon}"
+                           aria-describedby="monthsHorizon-help">
+                    <p id="monthsHorizon-help">Duración de la proyección (1 – 120 meses).</p>
+                    <output id="monthsHorizonValue" for="monthsHorizon monthsHorizonNumber"></output>
+                </div>
+            </fieldset>
+
+            <div>
+                <label for="scenarioName">Nombre del escenario</label>
+                <input type="text" id="scenarioName" name="scenarioName" class="touch-target" maxlength="100"
+                       th:value="${simulationRequest.scenarioName}" aria-describedby="scenarioName-help">
+                <p id="scenarioName-help">Se usa al guardar el escenario en su cuenta.</p>
+            </div>
+
+            <div class="simulator-actions">
+                <button type="submit" class="touch-target">Calcular proyección</button>
+                <button type="submit" id="saveBtn" class="touch-target"
+                        th:formaction="@{/simulator/save}">Guardar escenario</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="card" aria-labelledby="resultados-titulo">
+        <h2 id="resultados-titulo">Resultados</h2>
+        <p id="simulator-status" role="status" aria-live="polite">Ajuste los controles para calcular la proyección.</p>
+
+        <dl>
+            <dt>Ahorro base mensual</dt>
+            <dd id="res-base" th:text="${result != null} ? '$' + ${result.baseMonthlySavings} : '—'">—</dd>
+            <dt>Ahorro extra mensual</dt>
+            <dd id="res-extra" th:text="${result != null} ? '$' + ${result.extraMonthlySavings} : '—'">—</dd>
+            <dt>Total acumulado</dt>
+            <dd id="res-total" th:text="${result != null} ? '$' + ${result.projectedTotal} : '—'">—</dd>
+            <dt>Tiempo estimado para la meta</dt>
+            <dd id="res-goal-time" th:text="${result != null} ? ${result.monthsHorizon} + ' meses' : '—'">—</dd>
+        </dl>
+
+        <h3>Gráfica de crecimiento</h3>
+        <!--
+          La gráfica usa exclusivamente las variables CSS del tema activo;
+          la tabla siguiente contiene EXACTAMENTE los mismos datos mes a mes.
+        -->
+        <svg id="grafica" class="chart-svg" viewBox="0 0 640 260" role="img"
+             aria-label="Gráfica de evolución del patrimonio acumulado"></svg>
+
+        <div class="table-responsive">
+        <table id="desglose" aria-label="Tabla de datos de proyección financiera">
+            <caption>Desglose mes a mes: misma información que la gráfica, en formato textual.</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Mes</th>
+                    <th scope="col">Ahorro base acumulado</th>
+                    <th scope="col">Ahorro extra acumulado</th>
+                    <th scope="col">Total acumulado</th>
+                </tr>
+            </thead>
+            <tbody id="desglose-body">
+                <tr th:if="${result == null}"><td colspan="4">Ajuste los controles para generar el desglose.</td></tr>
+                <tr th:each="row : ${result?.breakdown}">
+                    <th scope="row" th:text="${row.month}">1</th>
+                    <td th:text="'$' + ${row.accumulatedBaseSavings}">$0.00</td>
+                    <td th:text="'$' + ${row.accumulatedExtraSavings}">$0.00</td>
+                    <td th:text="'$' + ${row.accumulatedTotal}">$0.00</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </section>
+
+    <section class="card" id="seccion-escenarios" aria-labelledby="guardados-titulo">
+        <h2 id="guardados-titulo">Escenarios guardados</h2>
+        <p th:if="${#lists.isEmpty(scenarios)}">Todavía no ha guardado ningún escenario.</p>
+        <div class="table-responsive" th:unless="${#lists.isEmpty(scenarios)}">
+        <table>
+            <caption>Escenarios de simulación guardados en su cuenta.</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Ingreso mensual</th>
+                    <th scope="col">Ahorro</th>
+                    <th scope="col">Meses</th>
+                    <th scope="col">Total proyectado</th>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="scenario : ${scenarios}">
+                    <td th:text="${scenario.scenarioName}">escenario</td>
+                    <td th:text="${scenario.monthlyIncome}">0.00</td>
+                    <td th:text="${scenario.savingsPercentage} + '%'">0%</td>
+                    <td th:text="${scenario.monthsHorizon}">0</td>
+                    <td th:text="${scenario.projectedTotal}">0.00</td>
+                    <td th:text="${#temporals.format(scenario.createdAt, 'dd/MM/yyyy HH:mm')}">fecha</td>
+                    <td>
+                        <div class="scenario-actions">
+                            <a class="touch-target load-scenario" th:href="@{/simulator(load=${scenario.id})}"
+                               th:attr="data-name=${scenario.scenarioName},data-income=${scenario.monthlyIncome},data-percentage=${scenario.savingsPercentage},data-cut=${scenario.antExpensesCut},data-months=${scenario.monthsHorizon}"
+                               th:attrappend="aria-label='Cargar escenario ' + ${scenario.scenarioName}">Cargar</a>
+                            <a class="touch-target edit-scenario" th:href="@{/simulator(edit=${scenario.id})}"
+                               th:attr="data-id=${scenario.id},data-name=${scenario.scenarioName},data-income=${scenario.monthlyIncome},data-percentage=${scenario.savingsPercentage},data-cut=${scenario.antExpensesCut},data-months=${scenario.monthsHorizon}"
+                               th:attrappend="aria-label='Editar escenario ' + ${scenario.scenarioName}">Editar</a>
+                            <form th:action="@{/simulator/scenarios/{id}/delete(id=${scenario.id})}" method="post"
+                                  th:attr="data-confirm='¿Eliminar el escenario ' + ${scenario.scenarioName} + '?'">
+                                <button type="submit" class="touch-target"
+                                        th:attr="aria-label='Eliminar escenario ' + ${scenario.scenarioName}">Eliminar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+
+        <!-- Edición sin JavaScript: el servidor renderiza el formulario. -->
+        <section class="card" th:if="${editingScenario != null}" aria-labelledby="editar-escenario-titulo">
+            <h3 id="editar-escenario-titulo">Editar escenario</h3>
+            <form method="post"
+                  th:action="@{/simulator/scenarios/{id}/edit(id=${editingScenario.id})}"
+                  th:object="${simulationRequest}" novalidate>
+                <div>
+                    <label for="edit-name-server">Nombre</label>
+                    <input id="edit-name-server" name="scenarioName" maxlength="100"
+                           th:value="${editingScenario.scenarioName}" required>
+                </div>
+                <div>
+                    <label for="edit-income-server">Ingreso mensual (MXN)</label>
+                    <input id="edit-income-server" type="number" name="monthlyIncome" min="0" max="25000" step="0.01"
+                           th:value="${editingScenario.monthlyIncome}" required>
+                </div>
+                <div>
+                    <label for="edit-percentage-server">Porcentaje de ahorro</label>
+                    <input id="edit-percentage-server" type="number" name="savingsPercentage" min="0" max="100" step="0.01"
+                           th:value="${editingScenario.savingsPercentage}" required>
+                </div>
+                <div>
+                    <label for="edit-cut-server">Recorte de gastos hormiga (MXN)</label>
+                    <input id="edit-cut-server" type="number" name="antExpensesCut" min="0" step="0.01"
+                           th:value="${editingScenario.antExpensesCut}" required>
+                </div>
+                <div>
+                    <label for="edit-months-server">Horizonte en meses</label>
+                    <input id="edit-months-server" type="number" name="monthsHorizon" min="1" max="120" step="1"
+                           th:value="${editingScenario.monthsHorizon}" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="touch-target">Guardar cambios</button>
+                    <a class="btn-secondary touch-target" th:href="@{/simulator#seccion-escenarios}">Cancelar</a>
+                </div>
+            </form>
+        </section>
+    </section>
+</main>
+<div th:replace="~{fragments/mascot :: mascot}">Asistente virtual Krono</div>
+<div th:replace="~{fragments/a11y-widget :: a11yWidget}">Opciones de accesibilidad</div>
+<div th:replace="~{fragments/footer :: footer}">Pie de página</div>
+
+<script th:src="@{/js/simulator.js}" defer></script>
+</body>
+</html>

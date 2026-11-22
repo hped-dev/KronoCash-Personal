@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<body>
+<!-- Navbar superior sticky con menú desplegable accesible en móvil/tablet. -->
+<header class="navbar" th:fragment="navbar">
+    <a class="brand-link touch-target" th:href="@{/}" aria-label="KronoCash, ir al inicio">
+        <svg class="brand-logo" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
+            <path d="M12 2 H24 L34 12 V24 L24 34 H12 L2 24 V12 Z"
+                  fill="var(--bg-primary)" stroke="var(--accent-color)" stroke-width="2"></path>
+            <circle cx="18" cy="18" r="11" fill="none" stroke="var(--accent-color)" stroke-width="2"></circle>
+            <path d="M18 7 A11 11 0 0 1 29 18" fill="none" stroke="var(--accent-color)"
+                  stroke-width="2" stroke-linecap="round"></path>
+            <polygon points="18,10 25,18 18,26 11,18" fill="var(--accent-color)"
+                     stroke="var(--bg-primary)" stroke-width="1.5"></polygon>
+            <line x1="18" y1="18" x2="18" y2="13" stroke="var(--bg-primary)"
+                  stroke-width="2" stroke-linecap="round"></line>
+        </svg>
+        <span class="brand-wordmark"><span class="brand-krono">Krono</span><span class="brand-cash">Cash</span></span>
+    </a>
+
+    <button type="button" class="nav-toggle-btn touch-target"
+            aria-expanded="false" aria-controls="primary-nav-menu" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4 7h16M4 12h16M4 17h16"></path>
+        </svg>
+        <span class="nav-toggle-label">Menú</span>
+    </button>
+
+    <nav id="primary-nav-menu" aria-label="Navegación principal">
+        <ul class="navbar-list">
+            <li>
+                <a class="nav-link touch-target" th:href="@{/}"
+                   th:classappend="${currentPath == '/'} ? 'active' : ''"
+                   th:attr="aria-current=${currentPath == '/'} ? 'page' : null">Inicio</a>
+            </li>
+            <li th:if="${authenticated}">
+                <a class="nav-link touch-target" th:href="@{/dashboard}"
+                   th:classappend="${currentPath == '/dashboard'} ? 'active' : ''"
+                   th:attr="aria-current=${currentPath == '/dashboard'} ? 'page' : null">Panel</a>
+            </li>
+            <li th:if="${authenticated}">
+                <a class="nav-link touch-target" th:href="@{/simulator}"
+                   th:classappend="${currentPath == '/simulator'} ? 'active' : ''"
+                   th:attr="aria-current=${currentPath == '/simulator'} ? 'page' : null">Simulador</a>
+            </li>
+            <li th:if="${authenticated}">
+                <a class="nav-link touch-target" th:href="@{/settings}"
+                   th:classappend="${currentPath == '/settings'} ? 'active' : ''"
+                   th:attr="aria-current=${currentPath == '/settings'} ? 'page' : null">Ajustes</a>
+            </li>
+            <li th:unless="${authenticated}">
+                <a class="nav-link touch-target" th:href="@{/login}"
+                   th:classappend="${currentPath == '/login'} ? 'active' : ''"
+                   th:attr="aria-current=${currentPath == '/login'} ? 'page' : null">Iniciar sesión</a>
+            </li>
+            <li th:unless="${authenticated}">
+                <a class="nav-link touch-target" th:href="@{/register}"
+                   th:classappend="${currentPath == '/register'} ? 'active' : ''"
+                   th:attr="aria-current=${currentPath == '/register'} ? 'page' : null">Crear cuenta</a>
+            </li>
+            <li th:if="${authenticated}">
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="touch-target">Cerrar sesión</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+</header>
+</body>
+</html>
