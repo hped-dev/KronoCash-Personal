@@ -1,5 +1,4 @@
 # Construcción (Build)
-
 FROM eclipse-temurin:25-jdk-alpine AS build
 WORKDIR /app
 
@@ -8,6 +7,9 @@ COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
+# Dar permisos de ejecución al wrapper de Maven
+RUN chmod +x mvnw
+
 # Descarga las dependencias
 RUN ./mvnw dependency:go-offline -B
 
@@ -15,10 +17,9 @@ RUN ./mvnw dependency:go-offline -B
 COPY src src
 
 # Compila el paquete empaquetando el JAR ejecutable (omite tests)
-RUN ./mvnw package
+RUN ./mvnw package -DskipTests
 
 # Ejecución Ligera (Runtime)
-
 FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
 
