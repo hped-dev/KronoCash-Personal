@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es"
+      th:attr="data-theme=${theme},data-dark-mode=${darkMode},data-reduce-motion=${reduceMotion},data-font-scale=${fontScale}"
+      th:style="'--font-scale: ' + ${fontScale} + '%'">
+<head th:replace="~{fragments/head :: head('Iniciar sesión')}">
+    <title>Iniciar sesión - KronoCash</title>
+</head>
+<body>
+<a th:replace="~{fragments/head :: skipLink}">Saltar al contenido principal</a>
+<p id="a11y-status" class="sr-only" role="status" aria-live="polite"></p>
+<header th:replace="~{fragments/navbar :: navbar}">Navegación principal</header>
+
+<main id="contenido-principal" class="auth-container" tabindex="-1">
+    <h1>Iniciar sesión</h1>
+
+    <p th:if="${param.error}" role="alert" aria-live="assertive">
+        El usuario o la contraseña no son correctos. Revise sus datos e inténtelo de nuevo.
+    </p>
+    <p th:if="${param.logout}" role="status" aria-live="polite">
+        Ha cerrado sesión correctamente.
+    </p>
+    <p th:if="${param.registered}" role="status" aria-live="polite">
+        Su cuenta se ha creado correctamente. Ya puede iniciar sesión.
+    </p>
+
+    <section class="card" aria-label="Formulario de inicio de sesión">
+    <!--
+      WCAG 2.2 SC 3.3.8: sin CAPTCHA, sin bloqueo de pegado, autocomplete
+      para gestores de contraseñas y etiquetas visibles para cada control.
+    -->
+    <form th:action="@{/login}" method="post" novalidate>
+        <div>
+            <label for="username">Nombre de usuario o correo electrónico</label>
+            <input type="text"
+                   id="username"
+                   name="username"
+                   autocomplete="username"
+                   aria-describedby="username-help"
+                   required>
+            <p id="username-help">Puede pegar el valor o dejar que su gestor de contraseñas lo complete.</p>
+        </div>
+
+        <div>
+            <label for="password">Contraseña</label>
+            <input type="password"
+                   id="password"
+                   name="password"
+                   autocomplete="current-password"
+                   data-sensitive="true"
+                   aria-describedby="password-help"
+                   required>
+            <p id="password-help">Su gestor de contraseñas puede rellenar este campo; no se impide pegar.</p>
+            <div class="checkbox-group">
+                <input type="checkbox" id="show-password-toggle" class="show-password-checkbox">
+                <label for="show-password-toggle">Mostrar contraseña</label>
+            </div>
+        </div>
+
+        <button type="submit">Entrar</button>
+    </form>
+    </section>
+
+    <p>¿Todavía no tiene cuenta? <a th:href="@{/register}">Crear una cuenta</a></p>
+</main>
+<div th:replace="~{fragments/mascot :: mascot}">Asistente virtual Krono</div>
+<div th:replace="~{fragments/a11y-widget :: a11yWidget}">Opciones de accesibilidad</div>
+<div th:replace="~{fragments/footer :: footer}">Pie de página</div>
+</body>
+</html>

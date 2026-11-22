@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es"
+      th:attr="data-theme=${theme},data-dark-mode=${darkMode},data-reduce-motion=${reduceMotion},data-font-scale=${fontScale}"
+      th:style="'--font-scale: ' + ${fontScale} + '%'">
+<head th:replace="~{fragments/head :: head('Ajustes de accesibilidad')}">
+    <title>Ajustes de accesibilidad - KronoCash</title>
+</head>
+<body>
+<a th:replace="~{fragments/head :: skipLink}">Saltar al contenido principal</a>
+<p id="a11y-status" class="sr-only" role="status" aria-live="polite"></p>
+<header th:replace="~{fragments/navbar :: navbar}">Navegación principal</header>
+
+<main id="contenido-principal" class="container settings-page" tabindex="-1">
+    <h1>Ajustes de accesibilidad</h1>
+
+    <!-- Easter egg: el backend decide si este usuario ve la felicitación. -->
+    <section th:if="${isBirthdayUser}" class="card birthday-card" id="birthday-card"
+             aria-labelledby="birthday-titulo">
+        <div class="birthday-confetti" aria-hidden="true">
+            <span style="--i: 0"></span><span style="--i: 1"></span>
+            <span style="--i: 2"></span><span style="--i: 3"></span>
+            <span style="--i: 4"></span><span style="--i: 5"></span>
+            <span style="--i: 6"></span><span style="--i: 7"></span>
+            <span style="--i: 8"></span><span style="--i: 9"></span>
+        </div>
+        <div class="birthday-header">
+            <h2 id="birthday-titulo">¡Feliz cumpleaños!</h2>
+            <button type="button" id="birthday-close" class="birthday-close touch-target"
+                    aria-label="Cerrar felicitación">×</button>
+        </div>
+        <p>¡Feliz cumpleaños, <strong>Comisario futuro-papá</strong>! 20 añotes bien vividos y disfrutados, espero.</p>
+        <p class="birthday-hint">Subele el volumen a tu celular y después da clic en el botón;D.</p>
+        <div class="form-actions">
+            <button type="button" id="birthday-music-btn" class="touch-target" aria-pressed="false">
+                Dale clic
+            </button>
+        </div>
+    </section>
+
+    <section class="card" aria-labelledby="perfil-titulo">
+        <h2 id="perfil-titulo">Mi perfil</h2>
+        <dl>
+            <div class="profile-row">
+                <dt>Nombre de usuario</dt>
+                <dd th:text="${profile.username}">usuario</dd>
+            </div>
+            <div class="profile-row">
+                <dt>Correo electrónico</dt>
+                <dd th:text="${profile.email}">correo@ejemplo.com</dd>
+            </div>
+            <div class="profile-row">
+                <dt>Miembro desde</dt>
+                <dd th:text="${#temporals.format(profile.createdAt, 'dd/MM/yyyy HH:mm')}">fecha</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="card" aria-labelledby="preferencias-titulo">
+        <h2 id="preferencias-titulo">Preferencias visuales</h2>
+        <p>Los cambios se aplican al instante y se guardan en su cuenta al pulsar «Guardar preferencias». Las opciones cognitivas también se pueden activar desde el widget flotante «Accesibilidad», que las guarda en este dispositivo.</p>
+
+        <p th:if="${param.saved}" role="status" aria-live="polite">
+            Preferencias guardadas correctamente.
+        </p>
+
+        <form th:action="@{/settings/preferences}" method="post" th:object="${preferencesRequest}">
+            <p th:if="${#fields.hasErrors('*')}" role="alert">
+                Revise los campos señalados a continuación.
+            </p>
+
+            <div>
+                <label for="themeStyle">Estilo visual</label>
+                <select id="themeStyle"
+                        th:field="*{themeStyle}"
+                        data-a11y-control="theme"
+                        aria-describedby="themeStyle-help themeStyle-errors">
+                    <option value="retro">Retro</option>
+                    <option value="minimal">Minimal</option>
+                    <option value="cyberpunk">Cyberpunk</option>
+                </select>
+                <p id="themeStyle-help">El tema se aplica mediante el atributo data-theme de la página.</p>
+                <p id="themeStyle-errors" class="error"
+                   th:if="${#fields.hasErrors('themeStyle')}" th:errors="*{themeStyle}"></p>
+            </div>
+
+            <fieldset>
+                <legend>Preferencias de movimiento y contraste</legend>
+
+                <div class="checkbox-line">
+                    <input type="checkbox"
+                           id="darkMode"
+                           th:field="*{darkMode}"
+                           data-a11y-control="darkMode"
+                           aria-describedby="darkMode-help">
+                    <label for="darkMode">Modo oscuro</label>
+                    <p id="darkMode-help">Aumenta el contraste en fondos oscuros.</p>
+                </div>
+
+                <div class="checkbox-line">
+                    <input type="checkbox"
+                           id="reduceMotion"
+                           th:field="*{reduceMotion}"
+                           data-a11y-control="reduceMotion"
+                           aria-describedby="reduceMotion-help">
+                    <label for="reduceMotion">Reducir movimiento</label>
+                    <p id="reduceMotion-help">Detiene transiciones y animaciones (WCAG 2.2 SC 2.3.3).</p>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Accesibilidad cognitiva y visual</legend>
+
+                <div class="checkbox-line">
+                    <input type="checkbox" id="dyslexicFont"
+                           data-a11y-control="dyslexicFont" aria-describedby="dyslexicFont-help">
+                    <label for="dyslexicFont">Tipografía para dislexia / lectura fácil</label>
+                    <p id="dyslexicFont-help">Usa OpenDyslexic, diseñada para baja visión y dislexia.</p>
+                </div>
+
+                <div class="checkbox-line">
+                    <input type="checkbox" id="wideSpacing"
+                           data-a11y-control="wideSpacing" aria-describedby="wideSpacing-help">
+                    <label for="wideSpacing">Espaciado de lectura ampliado</label>
+                    <p id="wideSpacing-help">Aumenta el interlineado y el espaciado entre palabras (WCAG 1.4.12).</p>
+                </div>
+
+                <div class="checkbox-line">
+                    <input type="checkbox" id="underlineLinks"
+                           data-a11y-control="underlineLinks" aria-describedby="underlineLinks-help">
+                    <label for="underlineLinks">Resaltar enlaces siempre</label>
+                    <p id="underlineLinks-help">Subraya todos los enlaces con grosores visibles.</p>
+                </div>
+            </fieldset>
+
+            <div>
+                <label for="fontScale">Escala de fuente</label>
+                <select id="fontScale"
+                        th:field="*{fontScale}"
+                        data-a11y-control="fontScale"
+                        aria-describedby="fontScale-help fontScale-errors">
+                    <option value="100">100%</option>
+                    <option value="125">125%</option>
+                    <option value="150">150%</option>
+                    <option value="175">175%</option>
+                    <option value="200">200%</option>
+                </select>
+                <p id="fontScale-help">Elija un tamaño entre 100% y 200% sin tener que escribir números.</p>
+                <p id="fontScale-errors" class="error"
+                   th:if="${#fields.hasErrors('fontScale')}" th:errors="*{fontScale}"></p>
+            </div>
+
+            <button type="submit">Guardar preferencias</button>
+        </form>
+    </section>
+
+    <p>Volver al <a th:href="@{/dashboard}">panel principal</a>.</p>
+</main>
+<div th:replace="~{fragments/mascot :: mascot}">Asistente virtual Krono</div>
+<div th:replace="~{fragments/a11y-widget :: a11yWidget}">Opciones de accesibilidad</div>
+<div th:replace="~{fragments/footer :: footer}">Pie de página</div>
+
+<script th:src="@{/js/birthday.js}" defer></script>
+</body>
+</html>

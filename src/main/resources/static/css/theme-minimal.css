@@ -1,0 +1,44 @@
+/* ==========================================================================
+   KronoCash - theme-minimal.css
+   Editorial / Suizo: Inter, blanco y gris neutro cálido, azul cobalto.
+   Geometría limpia: radio 12px, borde fino 1px, sin sombras pesadas.
+   Contraste verificado >= 7:1 en ambos modos.
+   ========================================================================== */
+
+html[data-theme="minimal"][data-dark-mode="false"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f4f4f5;
+    --text-main: #09090b;      /* 19.90:1 / 18.10:1 */
+    --text-muted: #3f3f46;     /* 10.44:1 /  9.50:1 */
+    --accent-color: #1e40af;   /*  8.72:1 /  7.94:1 */
+    --accent-hover: #1e3a8a;   /* 10.44:1 /  9.50:1 */
+    --error-color: #9f1239;    /*  8.02:1 /  7.29:1 */
+    --border-color: #52525b;
+    --border-width: 1px;
+    --border-radius: 0.75rem;  /* 12px */
+    --font-family: "Inter", system-ui, -apple-system, sans-serif;
+    --shadow: none;
+    --status-listen: #0f5a2e;  /*  8.33:1 / 7.57:1 */
+    --status-speak: #1e40af;
+    --glow-color: transparent;
+    --mascota-shadow: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
+}
+
+html[data-theme="minimal"][data-dark-mode="true"] {
+    --bg-primary: #111113;     /* gris neutro cálido, NO azulado */
+    --bg-secondary: #1c1c1f;
+    --text-main: #fafafa;      /* 18.07:1 / 16.29:1 */
+    --text-muted: #b4b4bb;     /*  9.15:1 /  8.25:1 */
+    --accent-color: #93c5fd;   /* 10.46:1 /  9.43:1 */
+    --accent-hover: #bfdbfe;   /* 13.6:1  / 12.3:1  */
+    --error-color: #fca5a5;    /*  9.94:1 /  8.96:1 */
+    --border-color: #71717a;
+    --border-width: 1px;
+    --border-radius: 0.75rem;
+    --font-family: "Inter", system-ui, -apple-system, sans-serif;
+    --shadow: none;
+    --status-listen: #4ade80;  /* verde sobre fondo cálido oscuro */
+    --status-speak: #93c5fd;
+    --glow-color: transparent;
+    --mascota-shadow: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
+}

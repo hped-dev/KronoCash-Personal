@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:fragment="head(pageTitle)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="KronoCash: educación financiera accesible.">
+    <title th:text="${pageTitle} + ' - KronoCash'">KronoCash</title>
+
+    <!-- Token CSRF para las peticiones fetch (CSRF no se desactiva en /api/**). -->
+    <th:block th:if="${_csrf != null}">
+        <meta name="_csrf" th:content="${_csrf.token}">
+        <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    </th:block>
+
+    <!-- Tipografías de marca con fallback técnico local -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
+    <link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap"
+          rel="stylesheet">
+
+    <!-- La base define los tokens y el foco; las skins los sobrescriben
+         según el atributo data-theme del elemento <html>. -->
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/theme-retro.css}">
+    <link rel="stylesheet" th:href="@{/css/theme-minimal.css}">
+    <link rel="stylesheet" th:href="@{/css/theme-cyberpunk.css}">
+    <!-- Aplica preferencias cognitivas guardadas antes de renderizar el body. -->
+    <script th:inline="none">
+        (function () {
+            try {
+                var prefs = JSON.parse(window.localStorage.getItem('kronocash.accessibility.v1') || '{}');
+                var root = document.documentElement;
+                if (prefs.dyslexicFont) { root.setAttribute('data-dyslexic-font', 'true'); }
+                if (prefs.wideSpacing) { root.setAttribute('data-wide-spacing', 'true'); }
+                if (prefs.underlineLinks) { root.setAttribute('data-underline-links', 'true'); }
+            } catch (ignored) { /* almacenamiento no disponible */ }
+        })();
+    </script>
+    <script th:src="@{/js/accessibility.js}" defer></script>
+    <script th:src="@{/js/form-validation.js}" defer></script>
+    <script th:src="@{/js/ui-feedback.js}" defer></script>
+    <script th:src="@{/js/nav.js}" defer></script>
+    <script th:src="@{/js/mascot-voice.js}" defer></script>
+</head>
+<body>
+<!-- Fragmento reutilizable: primer elemento enfocable de cada página (SC 2.4.1). -->
+<a th:fragment="skipLink" class="skip-link" href="#contenido-principal"
+   aria-label="Saltar al contenido principal">Saltar al contenido principal</a>
+</body>
+</html>

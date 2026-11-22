@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es"
+      th:attr="data-theme=${theme},data-dark-mode=${darkMode},data-reduce-motion=${reduceMotion},data-font-scale=${fontScale}"
+      th:style="'--font-scale: ' + ${fontScale} + '%'">
+<head th:replace="~{fragments/head :: head('Bienvenida')}">
+    <title>Bienvenida - KronoCash</title>
+</head>
+<body>
+<a th:replace="~{fragments/head :: skipLink}">Saltar al contenido principal</a>
+<p id="a11y-status" class="sr-only" role="status" aria-live="polite"></p>
+<header th:replace="~{fragments/navbar :: navbar}">Navegación principal</header>
+
+<main id="contenido-principal" class="container" tabindex="-1">
+
+    <!-- ===================== VISITANTE ANÓNIMO: LANDING ===================== -->
+    <div sec:authorize="isAnonymous()">
+        <section class="card hero" aria-labelledby="hero-titulo">
+            <h1 id="hero-titulo">Finanzas personales accesibles para todos</h1>
+            <p>Planifica tus ingresos, crea hábitos saludables y proyecta tu futuro patrimonio con una interfaz diseñada bajo WCAG 2.2 AAA.</p>
+            <p class="hero-actions">
+                <a class="btn touch-target" th:href="@{/register}">Crear cuenta gratis</a>
+                <a class="btn touch-target" th:href="@{/login}">Iniciar sesión</a>
+            </p>
+        </section>
+
+        <section class="card" aria-labelledby="vista-previa-titulo">
+            <h2 id="vista-previa-titulo">Prueba los estilos antes de registrarte</h2>
+            <p id="vista-previa-ayuda">Recorre las opciones con las flechas del teclado. Los cambios se aplican al instante y se recuerdan en este dispositivo.</p>
+            <fieldset aria-describedby="vista-previa-ayuda">
+                <legend class="sr-only">Estilos visuales disponibles</legend>
+                <ul class="theme-options">
+                    <li>
+                        <input type="radio" name="previewTheme" id="preview-retro" value="retro"
+                               data-a11y-control="theme" th:checked="${theme == 'retro'}"
+                               aria-describedby="vista-previa-ayuda">
+                        <label class="theme-option" for="preview-retro">
+                            <span class="theme-sample" aria-hidden="true">Aa</span>
+                            <span>Retro</span>
+                        </label>
+                    </li>
+                    <li>
+                        <input type="radio" name="previewTheme" id="preview-minimal" value="minimal"
+                               data-a11y-control="theme" th:checked="${theme == 'minimal'}"
+                               aria-describedby="vista-previa-ayuda">
+                        <label class="theme-option" for="preview-minimal">
+                            <span class="theme-sample" aria-hidden="true">Aa</span>
+                            <span>Minimal</span>
+                        </label>
+                    </li>
+                    <li>
+                        <input type="radio" name="previewTheme" id="preview-cyberpunk" value="cyberpunk"
+                               data-a11y-control="theme" th:checked="${theme == 'cyberpunk'}"
+                               aria-describedby="vista-previa-ayuda">
+                        <label class="theme-option" for="preview-cyberpunk">
+                            <span class="theme-sample" aria-hidden="true">Aa</span>
+                            <span>Cyberpunk</span>
+                        </label>
+                    </li>
+                </ul>
+            </fieldset>
+
+            <div class="form-group">
+                <input type="checkbox" id="preview-dark" data-a11y-control="darkMode"
+                       th:checked="${darkMode}" aria-describedby="preview-dark-help">
+                <label for="preview-dark">Modo oscuro</label>
+                <p id="preview-dark-help">Active esta casilla para alternar entre modo claro y modo oscuro.</p>
+            </div>
+        </section>
+
+        <section aria-labelledby="caracteristicas-titulo">
+            <h2 id="caracteristicas-titulo">Todo lo que necesitas para tu dinero</h2>
+            <div class="feature-grid">
+                <article class="card">
+                    <h3>Gestión financiera inteligente</h3>
+                    <p>Registra ingresos y egresos, filtra tu historial y consulta tu balance en un panel claro.</p>
+                </article>
+                <article class="card">
+                    <h3>Simulador patrimonial</h3>
+                    <p>Proyecta tu ahorro a futuro con el recorte de gastos hormiga y compara escenarios.</p>
+                </article>
+                <article class="card">
+                    <h3>Asistente virtual Krono</h3>
+                    <p>Controla la aplicación por voz y navega sin usar las manos con comandos en español.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="card" aria-labelledby="accesibilidad-titulo">
+            <h2 id="accesibilidad-titulo">Nuestro compromiso de accesibilidad</h2>
+            <ul>
+                <li>Navegación 100% por teclado con foco visible de 3px.</li>
+                <li>Contraste mínimo de 7:1 en los tres estilos y ambos modos.</li>
+                <li>Control de movimiento, escala de fuente y alternativas textuales para cada gráfica.</li>
+            </ul>
+        </section>
+    </div>
+
+    <!-- ===================== USUARIO AUTENTICADO: HUB ===================== -->
+    <div sec:authorize="isAuthenticated()">
+        <section class="card" aria-labelledby="hub-titulo">
+            <h1 id="hub-titulo">Bienvenido, <span sec:authentication="name">usuario</span></h1>
+            <p>Continúa donde lo dejaste o ajusta tu experiencia de accesibilidad.</p>
+        </section>
+
+        <section aria-labelledby="accesos-titulo">
+            <h2 id="accesos-titulo">Accesos directos</h2>
+            <div class="feature-grid">
+                <a class="card quick-link touch-target" th:href="@{/dashboard}">
+                    <svg class="quick-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M4 19V9m5 10V5m5 14v-7m5 7V8"></path>
+                    </svg>
+                    <h3>Panel Financiero</h3>
+                    <p>Consulta tu balance, movimientos, metas y hábitos.</p>
+                    <span class="quick-arrow" aria-hidden="true">→</span>
+                </a>
+                <a class="card quick-link touch-target" th:href="@{/simulator}">
+                    <svg class="quick-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M3 17l5-6 4 4 5-8 4 5"></path>
+                        <path d="M3 21h18"></path>
+                    </svg>
+                    <h3>Simulador de Escenarios</h3>
+                    <p>Proyecta tu patrimonio y guarda tus escenarios.</p>
+                    <span class="quick-arrow" aria-hidden="true">→</span>
+                </a>
+                <a class="card quick-link touch-target" th:href="@{/settings}">
+                    <svg class="quick-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10l2 2M19 5l-2 2M7 17l-2 2"></path>
+                    </svg>
+                    <h3>Ajustes de Accesibilidad</h3>
+                    <p>Tema, modo claro/oscuro, movimiento y escala de fuente.</p>
+                    <span class="quick-arrow" aria-hidden="true">→</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="card" aria-labelledby="estilo-rapido-titulo">
+            <h2 id="estilo-rapido-titulo">Cambio rápido de estilo</h2>
+            <p id="estilo-rapido-ayuda">Se guarda automáticamente en tu cuenta.</p>
+            <fieldset aria-describedby="estilo-rapido-ayuda">
+                <legend class="sr-only">Estilos visuales disponibles</legend>
+                <ul class="theme-options">
+                    <li>
+                        <input type="radio" name="quickTheme" id="quick-retro" value="retro"
+                               data-a11y-control="theme" th:checked="${theme == 'retro'}"
+                               aria-describedby="estilo-rapido-ayuda">
+                        <label class="theme-option" for="quick-retro">
+                            <span class="theme-sample" aria-hidden="true">Aa</span>
+                            <span>Retro</span>
+                        </label>
+                    </li>
+                    <li>
+                        <input type="radio" name="quickTheme" id="quick-minimal" value="minimal"
+                               data-a11y-control="theme" th:checked="${theme == 'minimal'}"
+                               aria-describedby="estilo-rapido-ayuda">
+                        <label class="theme-option" for="quick-minimal">
+                            <span class="theme-sample" aria-hidden="true">Aa</span>
+                            <span>Minimal</span>
+                        </label>
+                    </li>
+                    <li>
+                        <input type="radio" name="quickTheme" id="quick-cyberpunk" value="cyberpunk"
+                               data-a11y-control="theme" th:checked="${theme == 'cyberpunk'}"
+                               aria-describedby="estilo-rapido-ayuda">
+                        <label class="theme-option" for="quick-cyberpunk">
+                            <span class="theme-sample" aria-hidden="true">Aa</span>
+                            <span>Cyberpunk</span>
+                        </label>
+                    </li>
+                </ul>
+            </fieldset>
+            <div class="form-group">
+                <input type="checkbox" id="quick-dark" data-a11y-control="darkMode"
+                       th:checked="${darkMode}" aria-describedby="quick-dark-help">
+                <label for="quick-dark">Modo oscuro</label>
+                <p id="quick-dark-help">Alterna entre el modo claro y el oscuro.</p>
+            </div>
+        </section>
+    </div>
+</main>
+
+<div th:replace="~{fragments/mascot :: mascot}">Asistente virtual Krono</div>
+<div th:replace="~{fragments/a11y-widget :: a11yWidget}">Opciones de accesibilidad</div>
+<div th:replace="~{fragments/footer :: footer}">Pie de página</div>
+</body>
+</html>

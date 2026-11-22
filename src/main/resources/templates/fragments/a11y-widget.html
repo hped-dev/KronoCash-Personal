@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<body>
+<!-- Widget flotante de accesibilidad: esquina inferior IZQUIERDA (Krono está a la derecha).
+     El disparador va ANTES del panel en el DOM para que el foco fluya al abrirlo. -->
+<div th:fragment="a11yWidget" class="a11y-widget">
+    <button type="button"
+            id="a11y-toggle-btn"
+            class="touch-target"
+            aria-expanded="false"
+            aria-controls="a11y-panel"
+            aria-label="Opciones de accesibilidad">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="4" r="2"></circle>
+            <path d="M12 6v9m0 0l-4 6m4-6l4 6M5 9h14"></path>
+        </svg>
+        <span>Accesibilidad</span>
+    </button>
+
+    <div id="a11y-panel" role="region" aria-label="Panel de accesibilidad" hidden>
+        <h2 id="a11y-panel-titulo">Personalizar accesibilidad</h2>
+        <p id="a11y-panel-ayuda">Los cambios se aplican al instante y se guardan en este dispositivo.</p>
+
+        <div class="form-group">
+            <label for="a11y-theme">Tema visual</label>
+            <select id="a11y-theme" data-a11y-control="theme" aria-describedby="a11y-panel-ayuda">
+                <option value="retro">Retro</option>
+                <option value="minimal">Minimal</option>
+                <option value="cyberpunk">Cyberpunk</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <input type="checkbox" id="a11y-dark" data-a11y-control="darkMode"
+                   aria-describedby="a11y-dark-help">
+            <label for="a11y-dark">Modo oscuro</label>
+            <p id="a11y-dark-help">Active esta casilla para alternar entre modo claro y modo oscuro.</p>
+        </div>
+
+        <fieldset>
+            <legend>Escala de fuente</legend>
+            <div class="a11y-scale">
+                <button type="button" data-a11y-scale="decrease" aria-label="Reducir tamaño de fuente">−</button>
+                <output id="a11y-scale-value" aria-live="polite">100%</output>
+                <button type="button" data-a11y-scale="increase" aria-label="Aumentar tamaño de fuente">+</button>
+                <button type="button" data-a11y-scale="reset" aria-label="Restablecer tamaño de fuente al 100%">100%</button>
+            </div>
+        </fieldset>
+
+        <div class="form-group">
+            <input type="checkbox" id="a11y-dyslexic" data-a11y-control="dyslexicFont"
+                   aria-describedby="a11y-dyslexic-help">
+            <label for="a11y-dyslexic">Fuente OpenDyslexic</label>
+            <p id="a11y-dyslexic-help">Tipografía diseñada para facilitar la lectura.</p>
+        </div>
+
+        <div class="form-group">
+            <input type="checkbox" id="a11y-spacing" data-a11y-control="wideSpacing"
+                   aria-describedby="a11y-spacing-help">
+            <label for="a11y-spacing">Espaciado de lectura ampliado</label>
+            <p id="a11y-spacing-help">Más interlineado y separación entre palabras.</p>
+        </div>
+
+        <div class="form-group">
+            <input type="checkbox" id="a11y-motion" data-a11y-control="reduceMotion"
+                   aria-describedby="a11y-motion-help">
+            <label for="a11y-motion">Reducir movimiento</label>
+            <p id="a11y-motion-help">Detiene transiciones y animaciones.</p>
+        </div>
+
+        <div class="form-group">
+            <input type="checkbox" id="a11y-links" data-a11y-control="underlineLinks"
+                   aria-describedby="a11y-links-help">
+            <label for="a11y-links">Resaltar enlaces</label>
+            <p id="a11y-links-help">Subrayado permanente en todos los enlaces.</p>
+        </div>
+
+        <div class="form-group">
+            <input type="checkbox" id="a11y-cursor" data-a11y-control="cursorRing"
+                   aria-describedby="a11y-cursor-help">
+            <label for="a11y-cursor">Resaltar puntero del mouse</label>
+            <p id="a11y-cursor-help">Muestra un anillo guía alrededor del cursor. Se desactiva con movimiento reducido.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

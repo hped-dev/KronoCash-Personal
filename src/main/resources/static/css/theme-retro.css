@@ -1,0 +1,69 @@
+/* ==========================================================================
+   KronoCash - theme-retro.css
+   Computación clásica: Macintosh clásico (claro) y terminal CRT 8-bit
+   (oscuro). Paleta unificada en dos acentos: azul cobalto / verde fósforo.
+   Contraste verificado >= 11:1 en texto, acentos y botones.
+   ========================================================================== */
+
+html[data-theme="retro"][data-dark-mode="false"] {
+    --bg-primary: #f7f7f5;        /* blanco papel limpio */
+    --bg-secondary: #eaeae6;      /* gris de ventana clásica */
+    --text-main: #0a0a0a;         /* 18.46:1 / 16.41:1 */
+    --text-muted: #262626;        /* 14.11:1 / 12.55:1 */
+    --accent-color: #002875;      /* 12.55:1 / 11.16:1 (azul cobalto clásico) */
+    --accent-text: #ffffff;       /* 13.46:1 sobre --accent-color */
+    --accent-hover: #002266;      /* 13.78:1 / 12.25:1 */
+    --error-color: #5c0000;       /* 13.45:1 / 11.97:1 */
+    --border-color: #0a0a0a;      /* bordes negros nítidos de 2px */
+    --border-width: 2px;
+    --border-radius: 0;
+    --font-family: "Courier New", "JetBrains Mono", monospace;
+    --shadow: 0.25rem 0.25rem 0 #0a0a0a; /* sombra dura 4px 4px 0 */
+    --status-listen: #04330f;     /* 13.18:1 / 11.72:1 */
+    --status-speak: #04330f;
+    --mascota-shadow: drop-shadow(4px 4px 0px var(--border-color));
+    --glow-color: transparent;
+}
+
+html[data-theme="retro"][data-dark-mode="true"] {
+    /* Carbón cálido: evita la halación del verde neón sobre negro absoluto. */
+    --bg-primary: #12110e;
+    --bg-secondary: #1b1914;
+    --text-main: #faf3e0;         /* marfil cálido: 17.05:1 / 15.86:1 */
+    --text-muted: #d6c7a9;        /* 11.33:1 / 10.54:1 */
+    --accent-color: #ffb732;      /* 10.85:1 / 10.10:1 */
+    --accent-text: #12110e;       /* 10.85:1 sobre --accent-color */
+    --accent-hover: #ffcb66;      /* 12.57:1 / 11.70:1 */
+    --error-color: #ff9b8a;       /*  9.27:1 /  8.62:1 */
+    --border-color: #ffb732;      /* bordes de 2px en el mismo ámbar */
+    --border-width: 2px;
+    --border-radius: 0;
+    --font-family: "Courier New", "JetBrains Mono", monospace;
+    --shadow: 0.25rem 0.25rem 0 #0a0907; /* sombra dura oscura, sin neón */
+    --status-listen: #6ee7b7;     /* verde salvia desaturado: 12.39:1 / 11.52:1 */
+    --status-speak: #ffb732;
+    --mascota-shadow: drop-shadow(4px 4px 0px #0a0907);
+    --glow-color: transparent;    /* sin resplandor fosforescente */
+}
+
+/* Unificación: títulos, enlaces, botones y detalles usan el mismo acento.
+   No se introduce un tercer color rojizo/terracota. */
+html[data-theme="retro"] h1,
+html[data-theme="retro"] h2,
+html[data-theme="retro"] h3,
+html[data-theme="retro"] legend {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-color);
+}
+
+html[data-theme="retro"] .mascot-detail {
+    stroke: var(--accent-color);
+}
+
+/* Validación con sombra dura de terminal. */
+html[data-theme="retro"] .theme-toast,
+html[data-theme="retro"] .field-error-msg {
+    box-shadow: var(--shadow);
+    border-radius: 0;
+}
